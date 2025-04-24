@@ -1,5 +1,6 @@
 from typing import Union
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 
 ## Extra Library
 import numpy as np
@@ -18,13 +19,14 @@ def read_item(item_id: int, q: Union[str, None] = None):
 
 @app.get("/material_comp")
 def material_comp():
-    fname='assets/materials_compositions.csv'
-    cols=['compositions', 'SMP', 'WMP', 'WPC', 'Stab_a', 'Stab_b', 'Cocoa_a', 'Cocoa_b', 'Sugar', 'Minor']
-    df_compositions = pd.read_csv(fname,sep='\t', names=cols, index_col='compositions', skiprows=1)
-    return df_compositions.to_json()
+    df_compositions = pd.read_excel(open('assets/new_comp_fat_snf_prot_lac.xlsx', 'rb'), sheet_name='compo')
+    df_compositions = df_compositions.set_index('ingridient')
+    data = df_compositions.reset_index().to_dict(orient='records')
+    return data
 
 @app.get("/recipies")
 def recipies():
-    fname='assets/recipies.csv'
-    df_recepies = pd.read_csv(fname,sep='\t',names=['compositions','Chocolate','Plain','Strawberry'],index_col='compositions',skiprows=1)
-    return df_recepies.to_json()
+    df_recepies = pd.read_excel(open('assets/new_comp_fat_snf_prot_lac.xlsx', 'rb'), sheet_name='target')
+    df_recepies = df_recepies.set_index('receipe')
+    data = df_recepies.reset_index().to_dict(orient='records')
+    return data
